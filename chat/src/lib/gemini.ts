@@ -2,16 +2,18 @@ export async function getChatResponse(message: string) {
   const OPENROUTER_API_KEY = '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';
   
   try {
+    console.log("Making request to OpenRouter API with key:", OPENROUTER_API_KEY.substring(0, 10) + "...");
+    
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'http://localhost:5173', // Updated for localhost
+        'HTTP-Referer': 'localhost:5173',
         'X-Title': 'Shraa Chat Assistant'
       },
       body: JSON.stringify({
-        model: 'deepseek/deepseek-r1:free', // Changed to the specified model
+        model: 'deepseek/deepseek-r1:free',
         messages: [
           {
             role: 'system',
@@ -53,16 +55,26 @@ export async function getChatResponse(message: string) {
       })
     });
 
+    console.log("Response status:", response.status);
+    
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('OpenRouter API error:', errorData);
-      throw new Error(`API request failed with status ${response.status}: ${JSON.stringify(errorData)}`);
+      const errorText = await response.text();
+      console.error('OpenRouter API error response:', errorText);
+      
+      try {
+        const errorData = JSON.parse(errorText);
+        console.error('Parsed error data:', errorData);
+        throw new Error(`API request failed with status ${response.status}: ${JSON.stringify(errorData)}`);
+      } catch (parseError) {
+        throw new Error(`API request failed with status ${response.status}: ${errorText}`);
+      }
     }
 
     const data = await response.json();
+    console.log("Successfully received response from OpenRouter API");
     return data.choices[0].message.content;
   } catch (error) {
     console.error("Error generating chat response:", error);
-    return "Sorry, I encountered an error connecting to the AI service. Please try again in a moment.";
+    return "Sorry, I encountered an error connecting to the AI service. Please check the console for more details and ensure your API key is valid.";
   }
 }
