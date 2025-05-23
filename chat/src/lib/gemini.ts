@@ -1,7 +1,7 @@
 export async function getChatResponse(message: string) {
   // You need to replace this with your valid OpenRouter API key
   // Get one from: https://openrouter.ai/keys
-  const OPENROUTER_API_KEY = 'YOUR_OPENROUTER_API_KEY';
+  const OPENROUTER_API_KEY = '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';
   
   try {
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
