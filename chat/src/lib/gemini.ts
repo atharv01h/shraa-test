@@ -1,6 +1,4 @@
 export async function getChatResponse(message: string) {
-  // You need to replace this with your valid OpenRouter API key
-  // Get one from: https://openrouter.ai/keys
   const OPENROUTER_API_KEY = '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';
   
   try {
@@ -9,11 +7,11 @@ export async function getChatResponse(message: string) {
       headers: {
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://shraa-chat-app.com', // Replace with your actual site
+        'HTTP-Referer': 'http://localhost:5173', // Updated for localhost
         'X-Title': 'Shraa Chat Assistant'
       },
       body: JSON.stringify({
-        model: 'anthropic/claude-3-opus:beta', // You can change to a different model if needed
+        model: 'deepseek/deepseek-r1:free', // Changed to the specified model
         messages: [
           {
             role: 'system',
@@ -56,15 +54,15 @@ export async function getChatResponse(message: string) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       console.error('OpenRouter API error:', errorData);
-      throw new Error(`API request failed with status ${response.status}`);
+      throw new Error(`API request failed with status ${response.status}: ${JSON.stringify(errorData)}`);
     }
 
     const data = await response.json();
     return data.choices[0].message.content;
   } catch (error) {
     console.error("Error generating chat response:", error);
-    return "Sorry, I encountered an error with the OpenRouter API. Please check your API key and try again.";
+    return "Sorry, I encountered an error connecting to the AI service. Please try again in a moment.";
   }
 }
